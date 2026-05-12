@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>TabVault</title>
+  <link rel="stylesheet" href="newtab.css">
+</head>
+<body data-theme="dark">
+  <header class="topbar">
+    <nav class="ws-tabs" id="wsTabs"></nav>
+    <button class="ws-add" id="wsAddBtn" title="Новое рабочее пространство">+</button>
+  </header>
+
+  <main class="canvas" id="canvas"></main>
+
+  <div class="fab fab-tr">
+    <button class="fab-btn" id="searchBtn" title="Поиск">🔍</button>
+    <button class="fab-btn" id="menuBtn" title="Меню">☰</button>
+    <button class="fab-btn" id="settingsBtn" title="Настройки">⚙</button>
+  </div>
+
+  <div class="menu" id="settingsMenu" hidden>
+    <button data-act="theme">Тема: <span id="themeLbl"></span></button>
+    <button data-act="privacy">Приватный режим: <span id="privacyLbl"></span></button>
+    <button data-act="import">Импортировать закладки Chrome</button>
+<button data-act="reset">Сбросить всё</button>
+  </div>
+
+  <div class="search-panel" id="searchPanel" hidden>
+    <input type="text" id="searchInput" placeholder="Поиск по закладкам...">
+    <div class="search-results" id="searchResults"></div>
+  </div>
+
+  <template id="boardTpl">
+    <section class="board" draggable="false">
+      <header class="board-head">
+        <h3 class="board-name"></h3>
+        <div class="board-actions">
+          <button class="board-act board-act-add" title="Добавить ссылку" aria-label="add link">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l1.41-1.41a5 5 0 0 0-7.07-7.07l-1.41 1.41"/><path d="M14 11a5 5 0 0 0-7.07 0L5.5 12.43a5 5 0 0 0 7.07 7.07L14 18"/></svg>
+          </button>
+          <button class="board-act board-act-menu" title="Меню" aria-label="menu">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>
+          </button>
+        </div>
+      </header>
+      <ul class="board-list"></ul>
+    </section>
+  </template>
+
+  <template id="bmTpl">
+    <li class="bm" draggable="true">
+      <a class="bm-link">
+        <img class="bm-icon" alt="">
+        <div class="bm-text">
+          <span class="bm-title"></span>
+          <span class="bm-desc"></span>
+        </div>
+      </a>
+      <button class="bm-menu" title="Меню" aria-label="menu">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>
+      </button>
+    </li>
+  </template>
+
+<script src="newtab.js"></script>
+</body>
+</html>
