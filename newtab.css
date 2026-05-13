@@ -166,9 +166,12 @@ body.privacy .bm:hover .bm-icon { filter: blur(0); }
   color: var(--fg);
 }
 
-/* While dragging, only "near" cells (= placeholder positions) are valid drop targets */
+/* While dragging: "near" cells AND every row-0 cell are valid drop targets.
+   Row 0 of an empty column is a canonical "start a new column" slot — droppable
+   silently (no visible placeholder) so you can move a board into any direction. */
 .canvas.dragging-board .cell { pointer-events: none; }
-.canvas.dragging-board .cell.near { pointer-events: auto; }
+.canvas.dragging-board .cell.near,
+.canvas.dragging-board .cell[data-row="0"] { pointer-events: auto; }
 .canvas.dragging-board .cell > * { display: none; }
 .cell.drag-over {
   opacity: 1;
