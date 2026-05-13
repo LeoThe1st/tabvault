@@ -26,6 +26,7 @@ function defaultState() {
   return {
     theme: 'dark',
     privacy: false,
+    bgImage: null,
     activeWsId: wsId,
     workspaces: [{
       id: wsId,
@@ -103,9 +104,21 @@ function faviconFor(url) {
 function render() {
   document.body.dataset.theme = state.theme;
   document.body.classList.toggle('privacy', state.privacy);
+  applyBackground();
   renderTabs();
   renderCanvas();
   renderMenu();
+}
+
+function applyBackground() {
+  if (state.bgImage) {
+    const safe = state.bgImage.replace(/"/g, '\\"');
+    document.body.style.backgroundImage = `url("${safe}")`;
+    document.body.classList.add('has-bg');
+  } else {
+    document.body.style.backgroundImage = '';
+    document.body.classList.remove('has-bg');
+  }
 }
 
 function renderTabs() {
@@ -867,6 +880,63 @@ function openBookmarkEditModal(bm) {
   });
 }
 
+function openBgMenu(triggerBtn) {
+  document.querySelectorAll('.board-menu').forEach(m => m.remove());
+  const menu = document.createElement('div');
+  menu.className = 'board-menu';
+  const hasBg = !!state.bgImage;
+  menu.innerHTML = `
+    <button data-act="url">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l1.41-1.41a5 5 0 0 0-7.07-7.07l-1.41 1.41"/><path d="M14 11a5 5 0 0 0-7.07 0L5.5 12.43a5 5 0 0 0 7.07 7.07L14 18"/></svg>
+      Из URL
+    </button>
+    <button data-act="upload">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      С компьютера
+    </button>
+    ${hasBg ? `<div class="sep"></div>
+    <button data-act="remove" class="danger">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>
+      Убрать обои
+    </button>` : ''}`;
+  document.body.appendChild(menu);
+  const rect = triggerBtn.getBoundingClientRect();
+  const w = menu.offsetWidth;
+  const h = menu.offsetHeight;
+  menu.style.left = (rect.right + 8) + 'px';
+  menu.style.top = (rect.top - h + rect.height) + 'px';
+
+  const close = () => {
+    menu.remove();
+    document.removeEventListener('mousedown', onDoc);
+  };
+  const onDoc = e => { if (!menu.contains(e.target) && !triggerBtn.contains(e.target)) close(); };
+  setTimeout(() => document.addEventListener('mousedown', onDoc), 0);
+
+  menu.addEventListener('click', async e => {
+    const btn = e.target.closest('button');
+    const act = btn?.dataset.act;
+    if (!act) return;
+    close();
+    if (act === 'url') {
+      const url = await showPrompt({
+        title: 'Обои из URL',
+        label: 'Image URL',
+        required: true,
+        placeholder: 'https://example.com/bg.jpg'
+      });
+      if (!url) return;
+      state.bgImage = url;
+      save(); render();
+    } else if (act === 'upload') {
+      document.getElementById('bgFile').click();
+    } else if (act === 'remove') {
+      state.bgImage = null;
+      save(); render();
+    }
+  });
+}
+
 async function shareBoard(board) {
   const data = JSON.stringify({
     name: board.name,
@@ -986,6 +1056,28 @@ async function init() {
     const p = document.getElementById('searchPanel');
     p.hidden = !p.hidden;
     if (!p.hidden) document.getElementById('searchInput').focus();
+  });
+
+  document.getElementById('bgBtn').addEventListener('click', e => {
+    e.stopPropagation();
+    openBgMenu(e.currentTarget);
+  });
+  document.getElementById('bgFile').addEventListener('change', async e => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (file.size > 8 * 1024 * 1024) {
+      await showAlert({ title: 'Обои', message: 'Файл слишком большой (максимум 8 МБ).' });
+      return;
+    }
+    const dataUrl = await new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result);
+      r.onerror = rej;
+      r.readAsDataURL(file);
+    });
+    state.bgImage = dataUrl;
+    save(); render();
   });
   document.getElementById('searchInput').addEventListener('input', e => runSearch(e.target.value));
 

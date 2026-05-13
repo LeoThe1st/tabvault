@@ -43,11 +43,17 @@ body[data-theme="light"] {
 html, body {
   margin: 0;
   padding: 0;
-  background: var(--bg);
+  background-color: var(--bg);
   color: var(--fg);
   font-family: var(--font);
   min-height: 100vh;
   overflow-x: hidden;
+}
+body.has-bg {
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
 }
 
 
@@ -461,6 +467,7 @@ body[data-theme="light"] .board-form { background: rgba(0,0,0,0.02); }
   gap: 10px;
 }
 .fab-tr { right: 24px; bottom: 24px; }
+.fab-bl { left: 24px; bottom: 24px; }
 
 .fab-btn {
   width: 42px;
