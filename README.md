@@ -28,8 +28,6 @@ npm run typecheck
 4. Жми **Load unpacked** и выбери папку `dist/`
 5. Открой новую вкладку - увидишь TabVault
 
-В dev-режиме (`npm run dev`) `@crxjs/vite-plugin` тоже собирает расширение в `dist/` с HMR - можно сразу load unpacked этот же `dist/` и менять код на лету.
-
 ## Структура
 
 ```
@@ -45,5 +43,3 @@ src/
   lib/                   # uid, favicon, fetchMeta, normalizeUrl
   styles/global.css      # все стили
 ```
-
-Формат `state` в `chrome.storage.local` сохранён 1-в-1 с прежней ванильной версией - старые данные подхватятся автоматически.
