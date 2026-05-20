@@ -1,0 +1,110 @@
+import { useEffect, useMemo, useState } from 'react';
+import { useStore, attachExternalSync } from '@/store/store';
+import { DialogHost } from '@/dialogs/DialogHost';
+import { Topbar } from '@/components/Topbar';
+import { Canvas } from '@/components/Canvas';
+import { SettingsMenu } from '@/components/SettingsMenu';
+import { SearchPanel } from '@/components/SearchPanel';
+import { BackgroundPicker } from '@/components/BackgroundPicker';
+
+export function App() {
+  return (
+    <DialogHost>
+      <Root />
+    </DialogHost>
+  );
+}
+
+function Root() {
+  const theme = useStore((s) => s.theme);
+  const privacy = useStore((s) => s.privacy);
+  const bgImage = useStore((s) => s.bgImage);
+  const workspaces = useStore((s) => s.workspaces);
+  const activeWsId = useStore((s) => s.activeWsId);
+
+  const activeWs = useMemo(
+    () => workspaces.find((w) => w.id === activeWsId) ?? workspaces[0],
+    [workspaces, activeWsId]
+  );
+
+  useEffect(() => {
+    document.body.dataset.theme = theme;
+  }, [theme]);
+
+  useEffect(() => {
+    document.body.classList.toggle('privacy', privacy);
+  }, [privacy]);
+
+  useEffect(() => {
+    if (bgImage) {
+      document.body.style.backgroundImage = `url("${bgImage.replace(/"/g, '\\"')}")`;
+      document.body.classList.add('has-bg');
+    } else {
+      document.body.style.backgroundImage = '';
+      document.body.classList.remove('has-bg');
+    }
+  }, [bgImage]);
+
+  useEffect(() => attachExternalSync(), []);
+
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [settingsAnchor, setSettingsAnchor] = useState<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSearchOpen(false);
+        setSettingsAnchor(null);
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
+
+  if (!activeWs) return null;
+
+  return (
+    <>
+      <Topbar />
+      <Canvas ws={activeWs} />
+
+      <div className="fab fab-tr">
+        <button
+          className="fab-btn"
+          title="Поиск"
+          onClick={() => setSearchOpen((v) => !v)}
+        >
+          🔍
+        </button>
+        <button
+          className="fab-btn"
+          title="Меню"
+          onClick={(e) =>
+            setSettingsAnchor(settingsAnchor ? null : e.currentTarget)
+          }
+        >
+          ☰
+        </button>
+        <button
+          className="fab-btn"
+          title="Настройки"
+          onClick={(e) =>
+            setSettingsAnchor(settingsAnchor ? null : e.currentTarget)
+          }
+        >
+          ⚙
+        </button>
+      </div>
+
+      <BackgroundPicker />
+
+      {searchOpen && <SearchPanel onClose={() => setSearchOpen(false)} />}
+      {settingsAnchor && (
+        <SettingsMenu
+          anchor={settingsAnchor}
+          onClose={() => setSettingsAnchor(null)}
+        />
+      )}
+    </>
+  );
+}

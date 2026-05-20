@@ -6,7 +6,7 @@
   --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, sans-serif;
 }
 
-body[data-theme="dark"] {
+body[data-theme='dark'] {
   --bg: #0b0c10;
   --board-bg: rgba(22, 24, 30, 0.72);
   --board-border: rgba(255, 255, 255, 0.08);
@@ -22,7 +22,7 @@ body[data-theme="dark"] {
   --shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
 }
 
-body[data-theme="light"] {
+body[data-theme='light'] {
   --bg: #f3f4f7;
   --board-bg: rgba(255, 255, 255, 0.85);
   --board-border: rgba(0, 0, 0, 0.08);
@@ -55,7 +55,6 @@ body.has-bg {
   background-attachment: fixed;
   background-repeat: no-repeat;
 }
-
 
 body.privacy .bm-title,
 body.privacy .bm-icon { filter: blur(7px); transition: filter var(--tx); }
@@ -106,6 +105,11 @@ body.privacy .bm:hover .bm-icon { filter: blur(0); }
   justify-content: center;
   transition: width 180ms ease, opacity 180ms ease, transform 180ms ease;
   border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  cursor: pointer;
 }
 .ws-tab:hover .ws-chev,
 .ws-tab.menu-open .ws-chev {
@@ -113,7 +117,7 @@ body.privacy .bm:hover .bm-icon { filter: blur(0); }
   opacity: 1;
 }
 .ws-tab.menu-open .ws-chev { transform: rotate(180deg); }
-.ws-chev:hover { background: rgba(127,127,127,0.18); }
+.ws-chev:hover { background: rgba(127, 127, 127, 0.18); }
 .ws-chev svg { display: block; }
 
 .ws-add {
@@ -133,12 +137,18 @@ body.privacy .bm:hover .bm-icon { filter: blur(0); }
 .canvas {
   display: grid;
   grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr));
-  align-content: start;
+  align-items: start;
   gap: var(--gap);
   padding: 24px;
   max-width: 1500px;
   margin: 0 auto;
   min-height: calc(100vh - 100px);
+}
+.canvas-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  min-width: 0;
 }
 
 .cell {
@@ -153,7 +163,6 @@ body.privacy .bm:hover .bm-icon { filter: blur(0); }
   letter-spacing: 0.5px;
   font-family: var(--font);
   min-height: 92px;
-  align-self: start;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -164,7 +173,6 @@ body.privacy .bm:hover .bm-icon { filter: blur(0); }
 }
 .cell svg { flex-shrink: 0; }
 
-/* "near" — empty cell directly adjacent to a board (clickable, ghost) */
 .cell.near { pointer-events: auto; }
 .cell.near:hover {
   opacity: 1;
@@ -172,12 +180,9 @@ body.privacy .bm:hover .bm-icon { filter: blur(0); }
   color: var(--fg);
 }
 
-/* While dragging: "near" cells AND every row-0 cell are valid drop targets.
-   Row 0 of an empty column is a canonical "start a new column" slot — droppable
-   silently (no visible placeholder) so you can move a board into any direction. */
 .canvas.dragging-board .cell { pointer-events: none; }
 .canvas.dragging-board .cell.near,
-.canvas.dragging-board .cell[data-row="0"] { pointer-events: auto; }
+.canvas.dragging-board .cell[data-row='0'] { pointer-events: auto; }
 .canvas.dragging-board .cell > * { display: none; }
 .cell.drag-over {
   opacity: 1;
@@ -201,11 +206,10 @@ body.privacy .bm:hover .bm-icon { filter: blur(0); }
   box-shadow: var(--shadow);
   transition: border-color var(--tx), transform var(--tx);
   min-width: 0;
-  align-self: start;
 }
-.board.draggable-on,
-.board.draggable-on .board-head,
-.board.draggable-on .board-name { cursor: grabbing; }
+.board.dragging-active,
+.board.dragging-active .board-head,
+.board.dragging-active .board-name { cursor: grabbing; }
 .board-head { cursor: grab; user-select: none; }
 .board-name { cursor: grab; user-select: none; }
 .board-actions, .board-act { cursor: pointer; }
@@ -265,9 +269,9 @@ body.privacy .bm:hover .bm-icon { filter: blur(0); }
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background: rgba(255,255,255,0.02);
+  background: rgba(255, 255, 255, 0.02);
 }
-body[data-theme="light"] .board-form { background: rgba(0,0,0,0.02); }
+body[data-theme='light'] .board-form { background: rgba(0, 0, 0, 0.02); }
 .board-form input,
 .board-form textarea {
   background: transparent;
@@ -292,10 +296,7 @@ body[data-theme="light"] .board-form { background: rgba(0,0,0,0.02); }
   color: var(--fg-mute);
   margin-top: -6px;
 }
-.board-form .row {
-  display: flex;
-  gap: 8px;
-}
+.board-form .row { display: flex; gap: 8px; }
 .board-form .row > button { flex: 1; padding: 9px 10px; font-size: 13px; }
 .btn-danger {
   padding: 9px 10px;
@@ -334,7 +335,7 @@ body[data-theme="light"] .board-form { background: rgba(0,0,0,0.02); }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ===== Board menu dropdown ===== */
+/* ===== Popover menu ===== */
 .board-menu {
   position: fixed;
   background: var(--board-bg);
@@ -366,6 +367,7 @@ body[data-theme="light"] .board-form { background: rgba(0,0,0,0.02); }
   transition: var(--tx);
 }
 .board-menu button:hover { background: var(--row-hover); }
+.board-menu button:disabled { opacity: 0.4; cursor: not-allowed; }
 .board-menu button.danger { color: var(--danger); }
 .board-menu .sep { height: 1px; background: var(--board-border); margin: 4px 0; }
 .board-menu svg { flex-shrink: 0; opacity: 0.8; }
@@ -376,8 +378,9 @@ body[data-theme="light"] .board-form { background: rgba(0,0,0,0.02); }
   padding: 0;
   display: flex;
   flex-direction: column;
+  min-height: 8px;
 }
-.board-list.bm-drag-over { min-height: 30px; }
+.board-list.bm-drag-over { min-height: 30px; background: var(--row-hover); border-radius: var(--radius-sm); }
 
 .bm {
   display: flex;
@@ -403,8 +406,8 @@ body[data-theme="light"] .board-form { background: rgba(0,0,0,0.02); }
   font-size: 14.5px;
   cursor: pointer;
 }
-.bm-icon { margin-top: 2px; }
 .bm-icon {
+  margin-top: 2px;
   width: 20px;
   height: 20px;
   border-radius: 4px;
@@ -454,11 +457,6 @@ body[data-theme="light"] .board-form { background: rgba(0,0,0,0.02); }
 .bm-menu:hover { background: var(--row-hover); color: var(--fg); }
 .bm-menu svg { display: block; }
 
-/* Make empty bookmark lists more droppable */
-.board-list { min-height: 8px; }
-
-
-
 /* ===== Floating buttons ===== */
 .fab {
   position: fixed;
@@ -507,7 +505,6 @@ body[data-theme="light"] .board-form { background: rgba(0,0,0,0.02); }
   min-width: 240px;
   z-index: 90;
 }
-.menu[hidden] { display: none; }
 .menu button {
   border: none;
   background: transparent;
@@ -542,7 +539,6 @@ body[data-theme="light"] .board-form { background: rgba(0,0,0,0.02); }
   flex-direction: column;
   gap: 10px;
 }
-.search-panel[hidden] { display: none; }
 .search-panel input {
   background: transparent;
   border: 1px solid var(--board-border);
@@ -555,6 +551,17 @@ body[data-theme="light"] .board-form { background: rgba(0,0,0,0.02); }
 }
 .search-panel input:focus { border-color: var(--board-hover); }
 .search-results { max-height: 360px; overflow-y: auto; display: flex; flex-direction: column; }
+.search-results a {
+  display: flex;
+  align-items: center;
+  padding: 6px 8px;
+  text-decoration: none;
+  color: inherit;
+  border-radius: var(--radius-sm);
+  gap: 10px;
+}
+.search-results a:hover { background: var(--row-hover); }
+.search-results .meta { margin-left: auto; color: var(--fg-mute); font-size: 12px; }
 
 /* ===== Modal ===== */
 .modal {
@@ -567,7 +574,6 @@ body[data-theme="light"] .board-form { background: rgba(0,0,0,0.02); }
   z-index: 100;
   backdrop-filter: blur(4px);
 }
-.modal[hidden] { display: none; }
 .modal-card {
   background: var(--board-bg);
   border: 1px solid var(--board-border);
@@ -579,7 +585,11 @@ body[data-theme="light"] .board-form { background: rgba(0,0,0,0.02); }
   gap: 14px;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  transform: scale(0.96);
+  opacity: 0;
+  transition: transform 180ms ease, opacity 180ms ease;
 }
+.modal.open .modal-card { transform: scale(1); opacity: 1; }
 .modal-card h2 { margin: 0; font-size: 17px; }
 .modal-card label {
   display: flex;
@@ -602,8 +612,8 @@ body[data-theme="light"] .board-form { background: rgba(0,0,0,0.02); }
   resize: vertical;
 }
 .modal-card input[readonly] { color: var(--fg-mute); }
-body[data-theme="light"] .modal-card input,
-body[data-theme="light"] .modal-card textarea { background: rgba(0,0,0,0.04); }
+body[data-theme='light'] .modal-card input,
+body[data-theme='light'] .modal-card textarea { background: rgba(0, 0, 0, 0.04); }
 .modal-card input:focus,
 .modal-card textarea:focus { border-color: var(--board-hover); }
 
@@ -641,7 +651,5 @@ body[data-theme="light"] .modal-card textarea { background: rgba(0,0,0,0.04); }
 }
 .btn-danger-solid:hover { background: rgba(255, 92, 122, 0.24); }
 
-.modal-card { transform: scale(0.96); opacity: 0; transition: transform 180ms ease, opacity 180ms ease; }
-.modal.open .modal-card { transform: scale(1); opacity: 1; }
 .d-msg { margin: 0; color: var(--fg-mute); font-size: 14px; line-height: 1.5; }
 .d-req { color: var(--danger); margin-left: 2px; }

@@ -9,3 +9,7 @@ dist/
 build/
 *.tmp
 *.swp
+*.tsbuildinfo
+vite.config.js
+src/**/*.js
+src/**/*.js.map
