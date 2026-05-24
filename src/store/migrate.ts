@@ -1,6 +1,6 @@
 import { uid } from '@/lib/uid';
 import type { State, Workspace } from './types';
-import { MAX_COLS } from './types';
+import { MAX_COLS, TRASH_TTL_MS } from './types';
 
 export function migrateWorkspace(ws: Workspace): void {
   if (Array.isArray(ws.columns) && !Array.isArray(ws.boards)) {
@@ -44,5 +44,9 @@ export function migrateState(s: State): State {
     migrateWorkspace(w);
     for (let c = 0; c < w.cols; c++) compactColumn(w, c);
   }
+  if (!Array.isArray(s.trash)) s.trash = [];
+  // авто-чистка корзины старше 30 дней
+  const cutoff = Date.now() - TRASH_TTL_MS;
+  s.trash = s.trash.filter((e) => e.deletedAt > cutoff);
   return s;
 }

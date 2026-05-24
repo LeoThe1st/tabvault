@@ -9,6 +9,7 @@ export function defaultState(): State {
     privacy: false,
     bgImage: null,
     activeWsId: wsId,
+    trash: [],
     workspaces: [
       {
         id: wsId,

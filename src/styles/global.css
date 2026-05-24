@@ -56,10 +56,8 @@ body.has-bg {
   background-repeat: no-repeat;
 }
 
-body.privacy .bm-title,
-body.privacy .bm-icon { filter: blur(7px); transition: filter var(--tx); }
-body.privacy .bm:hover .bm-title,
-body.privacy .bm:hover .bm-icon { filter: blur(0); }
+body.privacy .board > * { filter: blur(8px); transition: filter var(--tx); }
+body.privacy .board:hover > * { filter: blur(0); }
 
 /* ===== Top workspace tabs ===== */
 .topbar {

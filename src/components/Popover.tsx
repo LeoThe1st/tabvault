@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
 type Anchor = HTMLElement | null;
-type Placement = 'below-left' | 'below-right' | 'right-of';
+type Placement = 'below-left' | 'below-right' | 'right-of' | 'left-of';
 
 interface Props {
   anchor: Anchor;
@@ -32,6 +32,10 @@ export function Popover({
     if (placement === 'below-right') left = r.right - w;
     if (placement === 'right-of') {
       left = r.right + 8;
+      top = r.top - h + r.height;
+    }
+    if (placement === 'left-of') {
+      left = r.left - w - 8;
       top = r.top - h + r.height;
     }
     left = Math.max(8, Math.min(window.innerWidth - w - 8, left));

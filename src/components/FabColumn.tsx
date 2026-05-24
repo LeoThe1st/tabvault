@@ -1,10 +1,17 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useStore } from '@/store/store';
+import { useDialogs } from '@/dialogs/DialogHost';
+import { importChromeBookmarks } from '@/lib/importChrome';
+import { ImportTextDialog } from './ImportTextDialog';
+import { TrashDialog } from './TrashDialog';
+import { Popover } from './Popover';
 import {
+  BrowserIcon,
   CloseIcon,
   DownloadIcon,
   EyeIcon,
   EyeOffIcon,
+  FileTextIcon,
   GearIcon,
   IncognitoIcon,
   MenuIcon,
@@ -19,10 +26,42 @@ interface Props {
 }
 
 export function FabColumn({ onSearchToggle, onSettingsToggle }: Props) {
+  const dialogs = useDialogs();
   const [open, setOpen] = useState(false);
   const [animating, setAnimating] = useState(false);
+  const [importAnchor, setImportAnchor] = useState<HTMLButtonElement | null>(null);
+  const [importTextOpen, setImportTextOpen] = useState(false);
+  const [trashOpen, setTrashOpen] = useState(false);
+  const trashCount = useStore((s) => s.trash.length);
   const privacy = useStore((s) => s.privacy);
   const setPrivacy = useStore((s) => s.setPrivacy);
+  const importBoards = useStore((s) => s.importBoards);
+
+  const onImportBrowser = async () => {
+    setImportAnchor(null);
+    if (typeof chrome === 'undefined' || !chrome.bookmarks) {
+      await dialogs.alert({
+        title: 'Импорт',
+        message: 'Доступно только в установленном расширении.'
+      });
+      return;
+    }
+    const folders = await importChromeBookmarks();
+    if (!folders.length) {
+      await dialogs.alert({ title: 'Импорт', message: 'Закладки не найдены.' });
+      return;
+    }
+    importBoards(folders);
+    await dialogs.alert({
+      title: 'Импорт',
+      message: `Импортировано: ${folders.length} досок`
+    });
+  };
+
+  const onImportText = () => {
+    setImportAnchor(null);
+    setImportTextOpen(true);
+  };
 
   // По клику снаружи — сворачиваем
   const rootRef = useRef<HTMLDivElement>(null);
@@ -50,14 +89,26 @@ export function FabColumn({ onSearchToggle, onSettingsToggle }: Props) {
     key: string;
     title: string;
     icon: ReactNode;
-    onClick?: () => void;
+    onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     active?: boolean;
     disabled?: boolean;
   }> = [
-    { key: 'import', title: 'Импорт', icon: <DownloadIcon />, disabled: true },
+    {
+      key: 'import',
+      title: 'Импорт',
+      icon: <DownloadIcon />,
+      onClick: (e) => setImportAnchor(importAnchor ? null : e.currentTarget),
+      active: !!importAnchor
+    },
     { key: 'incognito', title: 'Открывать в Incognito', icon: <IncognitoIcon />, disabled: true },
     { key: 'select', title: 'Режим выделения', icon: <SelectIcon />, disabled: true },
-    { key: 'trash', title: 'Корзина', icon: <TrashIcon />, disabled: true },
+    {
+      key: 'trash',
+      title: trashCount > 0 ? `Корзина (${trashCount})` : 'Корзина',
+      icon: <TrashIcon />,
+      onClick: () => setTrashOpen(true),
+      active: trashOpen
+    },
     {
       key: 'privacy',
       title: privacy ? 'Privacy: вкл' : 'Privacy: выкл',
@@ -114,6 +165,20 @@ export function FabColumn({ onSearchToggle, onSettingsToggle }: Props) {
       >
         <GearIcon />
       </button>
+
+      {importAnchor && (
+        <Popover anchor={importAnchor} placement="left-of" onClose={() => setImportAnchor(null)}>
+          <button onClick={() => void onImportBrowser()}>
+            <BrowserIcon /> Import Browser Bookmarks
+          </button>
+          <button onClick={onImportText}>
+            <FileTextIcon /> Import Links from Text/File
+          </button>
+        </Popover>
+      )}
+
+      {importTextOpen && <ImportTextDialog onClose={() => setImportTextOpen(false)} />}
+      {trashOpen && <TrashDialog onClose={() => setTrashOpen(false)} />}
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { uid } from '@/lib/uid';
 import { chromeStorage, subscribeExternalChanges } from './storage';
 import { defaultState } from './defaults';
 import { compactColumn, migrateState } from './migrate';
-import type { Bookmark, Board, State, Theme, Workspace } from './types';
+import type { Bookmark, Board, State, Theme, TrashEntry, Workspace } from './types';
 import { INBOX_NAME, MAX_COLS, STORAGE_KEY } from './types';
 
 interface Actions {
@@ -36,6 +36,10 @@ interface Actions {
   setBgImage: (img: string | null) => void;
   reset: () => void;
   replaceState: (s: State) => void;
+
+  restoreFromTrash: (entryId: string) => void;
+  purgeFromTrash: (entryId: string) => void;
+  emptyTrash: () => void;
 }
 
 type Store = State & Actions;
@@ -106,9 +110,16 @@ export const useStore = create<Store>()(
         const found = findBoardIn(next, boardId);
         if (!found) return;
         const col = found.board.col;
+        const entry: TrashEntry = {
+          id: uid(),
+          deletedAt: Date.now(),
+          kind: 'board',
+          wsId: found.ws.id,
+          data: clone(found.board)
+        };
         found.ws.boards = found.ws.boards.filter((b) => b.id !== boardId);
         compactColumn(found.ws, col);
-        set({ workspaces: next.workspaces });
+        set({ workspaces: next.workspaces, trash: [entry, ...next.trash] });
       },
 
       moveBoardTo: (boardId, col, row) => {
@@ -181,8 +192,17 @@ export const useStore = create<Store>()(
           for (const b of w.boards) {
             const idx = b.bookmarks.findIndex((x) => x.id === bmId);
             if (idx !== -1) {
-              b.bookmarks.splice(idx, 1);
-              set({ workspaces: next.workspaces });
+              const [removed] = b.bookmarks.splice(idx, 1);
+              const entry: TrashEntry = {
+                id: uid(),
+                deletedAt: Date.now(),
+                kind: 'bookmark',
+                wsId: w.id,
+                boardId: b.id,
+                boardName: b.name,
+                data: removed
+              };
+              set({ workspaces: next.workspaces, trash: [entry, ...next.trash] });
               return;
             }
           }
@@ -212,7 +232,63 @@ export const useStore = create<Store>()(
       setPrivacy: (p) => set({ privacy: p }),
       setBgImage: (img) => set({ bgImage: img }),
       reset: () => set({ ...defaultState() }),
-      replaceState: (s) => set({ ...s })
+      replaceState: (s) => set({ ...s }),
+
+      restoreFromTrash: (entryId) => {
+        const next = clone(get());
+        const idx = next.trash.findIndex((e) => e.id === entryId);
+        if (idx === -1) return;
+        const entry = next.trash[idx];
+        const ws = next.workspaces.find((w) => w.id === entry.wsId) ?? next.workspaces[0];
+        if (!ws) return;
+
+        if (entry.kind === 'bookmark') {
+          // целевая доска: оригинальная, если жива, иначе Inbox (создаём при отсутствии)
+          let board = ws.boards.find((b) => b.id === entry.boardId);
+          if (!board) {
+            board = ws.boards.find((b) => b.name === INBOX_NAME);
+          }
+          if (!board) {
+            const occ = new Set(ws.boards.map((b) => `${b.col}-${b.row}`));
+            let col = 0;
+            let row = 0;
+            outer: for (let r = 0; r < 100; r++) {
+              for (let c = 0; c < ws.cols; c++) {
+                if (!occ.has(`${c}-${r}`)) {
+                  col = c;
+                  row = r;
+                  break outer;
+                }
+              }
+            }
+            board = { id: uid(), name: INBOX_NAME, col, row, bookmarks: [] };
+            ws.boards.push(board);
+          }
+          board.bookmarks.unshift(entry.data);
+        } else {
+          // restore board в свою колонку, в конец
+          const restored = clone(entry.data);
+          const col = Math.max(0, Math.min(ws.cols - 1, restored.col));
+          const lastRow = ws.boards
+            .filter((b) => b.col === col)
+            .reduce((m, b) => Math.max(m, b.row), -1);
+          restored.col = col;
+          restored.row = lastRow + 1;
+          ws.boards.push(restored);
+          compactColumn(ws, col);
+        }
+
+        next.trash.splice(idx, 1);
+        set({ workspaces: next.workspaces, trash: next.trash });
+      },
+
+      purgeFromTrash: (entryId) => {
+        set({ trash: get().trash.filter((e) => e.id !== entryId) });
+      },
+
+      emptyTrash: () => {
+        set({ trash: [] });
+      }
     }),
     {
       name: STORAGE_KEY,
@@ -223,7 +299,8 @@ export const useStore = create<Store>()(
         privacy: s.privacy,
         bgImage: s.bgImage,
         activeWsId: s.activeWsId,
-        workspaces: s.workspaces
+        workspaces: s.workspaces,
+        trash: s.trash
       }),
       migrate: (persisted) => {
         if (!persisted) return defaultState();

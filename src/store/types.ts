@@ -34,14 +34,36 @@ export interface LegacyColumn {
 
 export type Theme = 'dark' | 'light';
 
+export interface TrashedBookmark {
+  id: string;
+  deletedAt: number;
+  kind: 'bookmark';
+  wsId: string;
+  boardId: string;
+  boardName: string; // для отображения "откуда удалено"
+  data: Bookmark;
+}
+
+export interface TrashedBoard {
+  id: string;
+  deletedAt: number;
+  kind: 'board';
+  wsId: string;
+  data: Board;
+}
+
+export type TrashEntry = TrashedBookmark | TrashedBoard;
+
 export interface State {
   theme: Theme;
   privacy: boolean;
   bgImage: string | null;
   activeWsId: string;
   workspaces: Workspace[];
+  trash: TrashEntry[];
 }
 
 export const MAX_COLS = 4;
 export const INBOX_NAME = 'Inbox';
 export const STORAGE_KEY = 'state';
+export const TRASH_TTL_MS = 30 * 24 * 60 * 60 * 1000;
