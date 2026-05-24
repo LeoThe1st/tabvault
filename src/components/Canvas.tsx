@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import {
   DndContext,
+  DragOverlay,
   PointerSensor,
   pointerWithin,
   useSensor,
@@ -9,7 +10,8 @@ import {
   type DragMoveEvent,
   type DragStartEvent
 } from '@dnd-kit/core';
-import type { Board, Workspace } from '@/store/types';
+import type { Board, Bookmark, Workspace } from '@/store/types';
+import { faviconFor } from '@/lib/favicon';
 import { useStore } from '@/store/store';
 import { BoardView } from './Board';
 import { Cell } from './Cell';
@@ -41,14 +43,26 @@ export function Canvas({ ws }: Props) {
   );
 
   const [dragType, setDragType] = useState<'board' | 'bookmark' | null>(null);
+  const [activeBm, setActiveBm] = useState<Bookmark | null>(null);
+  const [activeBoard, setActiveBoard] = useState<Board | null>(null);
   const [overCellId, setOverCellId] = useState<string | null>(null);
   const [boardMark, setBoardMark] = useState<BoardDropMark | null>(null);
   const [bmMark, setBmMark] = useState<BmDropMark | null>(null);
   const [listOverBoardId, setListOverBoardId] = useState<string | null>(null);
 
   const onDragStart = (e: DragStartEvent) => {
-    const t = (e.active.data.current?.type as 'board' | 'bookmark') ?? null;
+    const data = e.active.data.current as any;
+    const t = data?.type as 'board' | 'bookmark' | null ?? null;
     setDragType(t);
+    if (t === 'bookmark') {
+      for (const b of ws.boards) {
+        const bm = b.bookmarks.find((x) => x.id === data.bookmarkId);
+        if (bm) { setActiveBm(bm); break; }
+      }
+    } else if (t === 'board') {
+      const board = ws.boards.find((b) => b.id === data.boardId) ?? null;
+      setActiveBoard(board);
+    }
   };
 
   const clearMarks = () => {
@@ -133,11 +147,15 @@ export function Canvas({ ws }: Props) {
       }
     }
     setDragType(null);
+    setActiveBm(null);
+    setActiveBoard(null);
     clearMarks();
   };
 
   const onDragCancel = () => {
     setDragType(null);
+    setActiveBm(null);
+    setActiveBoard(null);
     clearMarks();
   };
 
@@ -228,6 +246,35 @@ export function Canvas({ ws }: Props) {
           </div>
         ))}
       </main>
+
+      <DragOverlay dropAnimation={null}>
+        {activeBm && <BookmarkOverlay bm={activeBm} />}
+        {activeBoard && <BoardOverlay board={activeBoard} />}
+      </DragOverlay>
     </DndContext>
+  );
+}
+
+function BookmarkOverlay({ bm }: { bm: Bookmark }) {
+  return (
+    <li className="bm" style={{ listStyle: 'none', opacity: 0.9, cursor: 'grabbing', pointerEvents: 'none' }}>
+      <span className="bm-link" style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '9px 10px', color: 'inherit', flex: 1, minWidth: 0, fontSize: 14.5 }}>
+        <img className="bm-icon" src={bm.favIconUrl || faviconFor(bm.url)} alt="" />
+        <span className="bm-text">
+          <span className="bm-title">{bm.title || bm.url}</span>
+          {bm.description && <span className="bm-desc">{bm.description}</span>}
+        </span>
+      </span>
+    </li>
+  );
+}
+
+function BoardOverlay({ board }: { board: Board }) {
+  return (
+    <section className="board" style={{ opacity: 0.9, cursor: 'grabbing', pointerEvents: 'none' }}>
+      <header className="board-head">
+        <h3 className="board-name">{board.name}</h3>
+      </header>
+    </section>
   );
 }
