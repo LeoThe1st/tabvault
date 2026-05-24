@@ -37,6 +37,8 @@ export function FabColumn({ onSearchToggle, onSettingsToggle }: Props) {
   const selection = useSelection();
   const privacy = useStore((s) => s.privacy);
   const setPrivacy = useStore((s) => s.setPrivacy);
+  const openInIncognito = useStore((s) => s.openInIncognito);
+  const setOpenInIncognito = useStore((s) => s.setOpenInIncognito);
   const importBoards = useStore((s) => s.importBoards);
 
   const onImportBrowser = async () => {
@@ -94,6 +96,7 @@ export function FabColumn({ onSearchToggle, onSettingsToggle }: Props) {
     onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     active?: boolean;
     disabled?: boolean;
+    extraClass?: string;
   }> = [
     {
       key: 'import',
@@ -102,7 +105,14 @@ export function FabColumn({ onSearchToggle, onSettingsToggle }: Props) {
       onClick: (e) => setImportAnchor(importAnchor ? null : e.currentTarget),
       active: !!importAnchor
     },
-    { key: 'incognito', title: 'Открывать в Incognito', icon: <IncognitoIcon />, disabled: true },
+    {
+      key: 'incognito',
+      title: openInIncognito ? 'Incognito: открывать в инкогнито' : 'Incognito: открывать обычно',
+      icon: <IncognitoIcon />,
+      onClick: () => setOpenInIncognito(!openInIncognito),
+      active: openInIncognito,
+      extraClass: 'fab-btn--incognito'
+    },
     {
       key: 'select',
       title: selection.active ? 'Выйти из режима выделения' : 'Режим выделения',
@@ -148,7 +158,9 @@ export function FabColumn({ onSearchToggle, onSettingsToggle }: Props) {
         {expandedItems.map((it, i) => (
           <button
             key={it.key}
-            className={'fab-btn' + (it.active ? ' active' : '')}
+            className={
+              'fab-btn' + (it.active ? ' active' : '') + (it.extraClass ? ' ' + it.extraClass : '')
+            }
             title={it.title}
             disabled={it.disabled}
             style={{ ['--i' as any]: i }}

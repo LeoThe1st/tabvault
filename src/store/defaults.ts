@@ -7,6 +7,7 @@ export function defaultState(): State {
   return {
     theme: 'dark',
     privacy: false,
+    openInIncognito: false,
     bgImage: null,
     activeWsId: wsId,
     trash: [],

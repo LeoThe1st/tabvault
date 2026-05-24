@@ -493,6 +493,12 @@ body.selecting .bm-link { cursor: pointer; }
 .fab-btn.active { background: var(--tab-active-bg); color: var(--tab-active-fg); }
 .fab-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 .fab-btn:disabled:hover { transform: none; border-color: var(--board-border); }
+.fab-btn--incognito.active {
+  background: #6d28d9;
+  color: #fff;
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.25), var(--shadow);
+}
 
 /* Раскрывающаяся колонка — в потоке. max-height + margin-top анимируются
    в обе стороны, search плавно поднимается/опускается. Item-stagger поверх. */

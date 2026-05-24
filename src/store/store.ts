@@ -33,6 +33,7 @@ interface Actions {
   setTheme: (t: Theme) => void;
   toggleTheme: () => void;
   setPrivacy: (p: boolean) => void;
+  setOpenInIncognito: (v: boolean) => void;
   setBgImage: (img: string | null) => void;
   reset: () => void;
   replaceState: (s: State) => void;
@@ -233,6 +234,7 @@ export const useStore = create<Store>()(
       setTheme: (t) => set({ theme: t }),
       toggleTheme: () => set({ theme: get().theme === 'dark' ? 'light' : 'dark' }),
       setPrivacy: (p) => set({ privacy: p }),
+      setOpenInIncognito: (v) => set({ openInIncognito: v }),
       setBgImage: (img) => set({ bgImage: img }),
       reset: () => set({ ...defaultState() }),
       replaceState: (s) => set({ ...s }),
@@ -360,6 +362,7 @@ export const useStore = create<Store>()(
       partialize: (s): State => ({
         theme: s.theme,
         privacy: s.privacy,
+        openInIncognito: s.openInIncognito,
         bgImage: s.bgImage,
         activeWsId: s.activeWsId,
         workspaces: s.workspaces,

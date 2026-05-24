@@ -57,6 +57,7 @@ export type TrashEntry = TrashedBookmark | TrashedBoard;
 export interface State {
   theme: Theme;
   privacy: boolean;
+  openInIncognito: boolean;
   bgImage: string | null;
   activeWsId: string;
   workspaces: Workspace[];

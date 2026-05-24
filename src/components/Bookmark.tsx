@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { useDraggable, useDroppable } from '@dnd-kit/core';
 import type { Bookmark as Bm, Board } from '@/store/types';
 import { faviconFor } from '@/lib/favicon';
+import { openUrl } from '@/lib/openUrl';
 import { useStore } from '@/store/store';
 import { useDialogs } from '@/dialogs/DialogHost';
 import { useSelection } from '@/contexts/SelectionContext';
@@ -18,6 +19,7 @@ export function BookmarkItem({ bm, board, dropMark }: Props) {
   const dialogs = useDialogs();
   const updateBookmark = useStore((s) => s.updateBookmark);
   const deleteBookmark = useStore((s) => s.deleteBookmark);
+  const openInIncognito = useStore((s) => s.openInIncognito);
   const selection = useSelection();
   const isSelected = selection.isSelected(bm.id);
 
@@ -40,13 +42,21 @@ export function BookmarkItem({ bm, board, dropMark }: Props) {
   const [iconBroken, setIconBroken] = useState(false);
   const menuBtnRef = useRef<HTMLButtonElement>(null);
 
-  const onClick = (e: React.MouseEvent) => {
+  const onClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (selection.active) {
       selection.toggle(bm.id);
       return;
     }
-    window.open(bm.url, '_self');
+    const r = await openUrl(bm.url, { incognito: openInIncognito });
+    if (!r.ok && r.reason === 'no-permission') {
+      await dialogs.alert({
+        title: 'Incognito недоступен',
+        message:
+          'Чтобы открывать ссылки в инкогнито, разреши расширению работать в incognito:\n' +
+          'chrome://extensions → TabVault → Details → "Allow in Incognito".'
+      });
+    }
   };
 
   const onEdit = async () => {
