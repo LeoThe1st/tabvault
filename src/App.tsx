@@ -4,7 +4,7 @@ import { DialogHost } from '@/dialogs/DialogHost';
 import { SelectionProvider, useSelection } from '@/contexts/SelectionContext';
 import { Topbar } from '@/components/Topbar';
 import { Canvas } from '@/components/Canvas';
-import { SettingsMenu } from '@/components/SettingsMenu';
+import { SettingsModal } from '@/components/SettingsModal';
 import { SearchPanel } from '@/components/SearchPanel';
 import { BackgroundPicker } from '@/components/BackgroundPicker';
 import { FabColumn } from '@/components/FabColumn';
@@ -31,6 +31,10 @@ function BodySelectingClass() {
 function Root() {
   const theme = useStore((s) => s.theme);
   const privacy = useStore((s) => s.privacy);
+  const animations = useStore((s) => s.animations);
+  const compact = useStore((s) => s.compact);
+  const showFavicons = useStore((s) => s.showFavicons);
+  const showDescriptions = useStore((s) => s.showDescriptions);
   const bgImage = useStore((s) => s.bgImage);
   const workspaces = useStore((s) => s.workspaces);
   const activeWsId = useStore((s) => s.activeWsId);
@@ -49,6 +53,22 @@ function Root() {
   }, [privacy]);
 
   useEffect(() => {
+    document.body.classList.toggle('no-anims', !animations);
+  }, [animations]);
+
+  useEffect(() => {
+    document.body.classList.toggle('compact', compact);
+  }, [compact]);
+
+  useEffect(() => {
+    document.body.classList.toggle('hide-favicons', !showFavicons);
+  }, [showFavicons]);
+
+  useEffect(() => {
+    document.body.classList.toggle('hide-descriptions', !showDescriptions);
+  }, [showDescriptions]);
+
+  useEffect(() => {
     if (bgImage) {
       document.body.style.backgroundImage = `url("${bgImage.replace(/"/g, '\\"')}")`;
       document.body.classList.add('has-bg');
@@ -61,13 +81,12 @@ function Root() {
   useEffect(() => attachExternalSync(), []);
 
   const [searchOpen, setSearchOpen] = useState(false);
-  const [settingsAnchor, setSettingsAnchor] = useState<HTMLButtonElement | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setSearchOpen(false);
-        setSettingsAnchor(null);
       }
     };
     document.addEventListener('keydown', onKey);
@@ -83,9 +102,7 @@ function Root() {
 
       <FabColumn
         onSearchToggle={() => setSearchOpen((v) => !v)}
-        onSettingsToggle={(anchor) =>
-          setSettingsAnchor(settingsAnchor ? null : anchor)
-        }
+        onSettingsToggle={() => setSettingsOpen((v) => !v)}
       />
 
       <BackgroundPicker />
@@ -94,12 +111,7 @@ function Root() {
       <BodySelectingClass />
 
       {searchOpen && <SearchPanel onClose={() => setSearchOpen(false)} />}
-      {settingsAnchor && (
-        <SettingsMenu
-          anchor={settingsAnchor}
-          onClose={() => setSettingsAnchor(null)}
-        />
-      )}
+      {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
     </>
   );
 }

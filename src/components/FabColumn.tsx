@@ -23,7 +23,7 @@ import {
 
 interface Props {
   onSearchToggle: () => void;
-  onSettingsToggle: (anchor: HTMLButtonElement) => void;
+  onSettingsToggle: () => void;
 }
 
 export function FabColumn({ onSearchToggle, onSettingsToggle }: Props) {
@@ -187,7 +187,7 @@ export function FabColumn({ onSearchToggle, onSettingsToggle }: Props) {
       <button
         className="fab-btn"
         title="Настройки"
-        onClick={(e) => onSettingsToggle(e.currentTarget)}
+        onClick={onSettingsToggle}
       >
         <GearIcon />
       </button>

@@ -48,5 +48,11 @@ export function migrateState(s: State): State {
   // авто-чистка корзины старше 30 дней
   const cutoff = Date.now() - TRASH_TTL_MS;
   s.trash = s.trash.filter((e) => e.deletedAt > cutoff);
+  // defaults для новых полей (после обновления версии)
+  if (typeof s.animations !== 'boolean') s.animations = true;
+  if (typeof s.compact !== 'boolean') s.compact = false;
+  if (typeof s.showFavicons !== 'boolean') s.showFavicons = true;
+  if (typeof s.showDescriptions !== 'boolean') s.showDescriptions = true;
+  if (typeof s.openInIncognito !== 'boolean') s.openInIncognito = false;
   return s;
 }

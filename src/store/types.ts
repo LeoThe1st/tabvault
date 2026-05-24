@@ -58,6 +58,10 @@ export interface State {
   theme: Theme;
   privacy: boolean;
   openInIncognito: boolean;
+  animations: boolean;
+  compact: boolean;
+  showFavicons: boolean;
+  showDescriptions: boolean;
   bgImage: string | null;
   activeWsId: string;
   workspaces: Workspace[];
