@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useStore } from '@/store/store';
 import { useDialogs } from '@/dialogs/DialogHost';
+import { useSelection } from '@/contexts/SelectionContext';
 import { importChromeBookmarks } from '@/lib/importChrome';
 import { ImportTextDialog } from './ImportTextDialog';
 import { TrashDialog } from './TrashDialog';
@@ -33,6 +34,7 @@ export function FabColumn({ onSearchToggle, onSettingsToggle }: Props) {
   const [importTextOpen, setImportTextOpen] = useState(false);
   const [trashOpen, setTrashOpen] = useState(false);
   const trashCount = useStore((s) => s.trash.length);
+  const selection = useSelection();
   const privacy = useStore((s) => s.privacy);
   const setPrivacy = useStore((s) => s.setPrivacy);
   const importBoards = useStore((s) => s.importBoards);
@@ -101,7 +103,19 @@ export function FabColumn({ onSearchToggle, onSettingsToggle }: Props) {
       active: !!importAnchor
     },
     { key: 'incognito', title: 'Открывать в Incognito', icon: <IncognitoIcon />, disabled: true },
-    { key: 'select', title: 'Режим выделения', icon: <SelectIcon />, disabled: true },
+    {
+      key: 'select',
+      title: selection.active ? 'Выйти из режима выделения' : 'Режим выделения',
+      icon: <SelectIcon />,
+      onClick: () => {
+        if (selection.active) selection.exit();
+        else {
+          selection.enter();
+          setOpen(false); // сворачиваем FAB, чтобы не мешал
+        }
+      },
+      active: selection.active
+    },
     {
       key: 'trash',
       title: trashCount > 0 ? `Корзина (${trashCount})` : 'Корзина',

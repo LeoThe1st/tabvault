@@ -13,6 +13,7 @@ import {
 import type { Board, Bookmark, Workspace } from '@/store/types';
 import { faviconFor } from '@/lib/favicon';
 import { useStore } from '@/store/store';
+import { useSelection } from '@/contexts/SelectionContext';
 import { BoardView } from './Board';
 import { Cell } from './Cell';
 
@@ -37,6 +38,8 @@ export function Canvas({ ws }: Props) {
   const moveBoardTo = useStore((s) => s.moveBoardTo);
   const insertBoardAt = useStore((s) => s.insertBoardAt);
   const moveBookmark = useStore((s) => s.moveBookmark);
+  const bulkMoveBookmarks = useStore((s) => s.bulkMoveBookmarks);
+  const selection = useSelection();
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
@@ -135,7 +138,18 @@ export function Canvas({ ws }: Props) {
           insertBoardAt(aData.boardId, oData.col, oData.row, before);
         }
       } else if (aData.type === 'bookmark' && oData) {
-        if (oData.type === 'bm' && oData.bookmarkId !== aData.bookmarkId) {
+        const targetBoardId =
+          oData.type === 'bm' ? oData.boardId : oData.type === 'list' ? oData.boardId : null;
+        // Bulk-move если режим выделения активен и тащим выделенную закладку
+        if (
+          aData.selectionActive &&
+          aData.selected &&
+          selection.count > 0 &&
+          targetBoardId
+        ) {
+          bulkMoveBookmarks([...selection.selectedIds], targetBoardId);
+          selection.clear();
+        } else if (oData.type === 'bm' && oData.bookmarkId !== aData.bookmarkId) {
           const before = bmMark?.before ?? true;
           moveBookmark(aData.bookmarkId, aData.fromBoardId, oData.boardId, {
             bookmarkId: oData.bookmarkId,

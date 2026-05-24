@@ -1,19 +1,31 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useStore, attachExternalSync } from '@/store/store';
 import { DialogHost } from '@/dialogs/DialogHost';
+import { SelectionProvider, useSelection } from '@/contexts/SelectionContext';
 import { Topbar } from '@/components/Topbar';
 import { Canvas } from '@/components/Canvas';
 import { SettingsMenu } from '@/components/SettingsMenu';
 import { SearchPanel } from '@/components/SearchPanel';
 import { BackgroundPicker } from '@/components/BackgroundPicker';
 import { FabColumn } from '@/components/FabColumn';
+import { SelectionBar } from '@/components/SelectionBar';
 
 export function App() {
   return (
     <DialogHost>
-      <Root />
+      <SelectionProvider>
+        <Root />
+      </SelectionProvider>
     </DialogHost>
   );
+}
+
+function BodySelectingClass() {
+  const { active } = useSelection();
+  useEffect(() => {
+    document.body.classList.toggle('selecting', active);
+  }, [active]);
+  return null;
 }
 
 function Root() {
@@ -77,6 +89,9 @@ function Root() {
       />
 
       <BackgroundPicker />
+
+      <SelectionBar />
+      <BodySelectingClass />
 
       {searchOpen && <SearchPanel onClose={() => setSearchOpen(false)} />}
       {settingsAnchor && (

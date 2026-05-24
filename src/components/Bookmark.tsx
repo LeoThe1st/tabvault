@@ -4,6 +4,7 @@ import type { Bookmark as Bm, Board } from '@/store/types';
 import { faviconFor } from '@/lib/favicon';
 import { useStore } from '@/store/store';
 import { useDialogs } from '@/dialogs/DialogHost';
+import { useSelection } from '@/contexts/SelectionContext';
 import { Popover } from './Popover';
 import { DotsIcon, EditIcon, TrashIcon } from './icons';
 
@@ -17,10 +18,18 @@ export function BookmarkItem({ bm, board, dropMark }: Props) {
   const dialogs = useDialogs();
   const updateBookmark = useStore((s) => s.updateBookmark);
   const deleteBookmark = useStore((s) => s.deleteBookmark);
+  const selection = useSelection();
+  const isSelected = selection.isSelected(bm.id);
 
   const draggable = useDraggable({
     id: 'bm:' + bm.id,
-    data: { type: 'bookmark', bookmarkId: bm.id, fromBoardId: board.id }
+    data: {
+      type: 'bookmark',
+      bookmarkId: bm.id,
+      fromBoardId: board.id,
+      selected: isSelected,
+      selectionActive: selection.active
+    }
   });
   const droppable = useDroppable({
     id: 'bm-drop:' + bm.id,
@@ -33,6 +42,10 @@ export function BookmarkItem({ bm, board, dropMark }: Props) {
 
   const onClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    if (selection.active) {
+      selection.toggle(bm.id);
+      return;
+    }
     window.open(bm.url, '_self');
   };
 
@@ -62,7 +75,8 @@ export function BookmarkItem({ bm, board, dropMark }: Props) {
     draggable.isDragging && 'dragging',
     menuAnchor && 'menu-open',
     dropMark === 'before' && 'drop-before',
-    dropMark === 'after' && 'drop-after'
+    dropMark === 'after' && 'drop-after',
+    isSelected && 'selected'
   ]
     .filter(Boolean)
     .join(' ');

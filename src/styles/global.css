@@ -391,6 +391,13 @@ body[data-theme='light'] .board-form { background: rgba(0, 0, 0, 0.02); }
 .bm.dragging { opacity: 0.35; }
 .bm.drop-before { box-shadow: inset 0 2px 0 var(--accent); }
 .bm.drop-after { box-shadow: inset 0 -2px 0 var(--accent); }
+.bm.selected {
+  background: var(--row-hover);
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+body.selecting .bm { cursor: pointer; }
+body.selecting .bm-menu { display: none; }
+body.selecting .bm-link { cursor: pointer; }
 
 .bm-link {
   display: flex;
@@ -697,3 +704,37 @@ body[data-theme='light'] .modal-card textarea { background: rgba(0, 0, 0, 0.04);
 
 .d-msg { margin: 0; color: var(--fg-mute); font-size: 14px; line-height: 1.5; }
 .d-req { color: var(--danger); margin-left: 2px; }
+
+/* ===== Selection mode bottom bar ===== */
+.selection-bar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--board-bg);
+  border: 1px solid var(--board-border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 80;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--shadow);
+  font-size: 13px;
+  font-family: var(--font);
+  animation: sb-rise 200ms cubic-bezier(.2, .7, .2, 1);
+}
+@keyframes sb-rise {
+  from { transform: translate(-50%, 20px); opacity: 0; }
+  to   { transform: translate(-50%, 0);    opacity: 1; }
+}
+.selection-bar .sb-hint { color: var(--fg-mute); }
+.selection-bar .sb-count { color: var(--fg); }
+.selection-bar .sb-count b { color: var(--fg); font-weight: 700; }
+.selection-bar button { padding: 7px 14px; font-size: 13px; }
+.selection-bar .btn-danger-solid:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}

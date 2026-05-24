@@ -40,6 +40,9 @@ interface Actions {
   restoreFromTrash: (entryId: string) => void;
   purgeFromTrash: (entryId: string) => void;
   emptyTrash: () => void;
+
+  bulkDeleteBookmarks: (ids: string[]) => void;
+  bulkMoveBookmarks: (ids: string[], toBoardId: string) => void;
 }
 
 type Store = State & Actions;
@@ -288,6 +291,66 @@ export const useStore = create<Store>()(
 
       emptyTrash: () => {
         set({ trash: [] });
+      },
+
+      bulkDeleteBookmarks: (ids) => {
+        if (!ids.length) return;
+        const next = clone(get());
+        const idSet = new Set(ids);
+        const now = Date.now();
+        const newEntries: TrashEntry[] = [];
+        for (const w of next.workspaces) {
+          for (const b of w.boards) {
+            const kept: Bookmark[] = [];
+            for (const bm of b.bookmarks) {
+              if (idSet.has(bm.id)) {
+                newEntries.push({
+                  id: uid(),
+                  deletedAt: now,
+                  kind: 'bookmark',
+                  wsId: w.id,
+                  boardId: b.id,
+                  boardName: b.name,
+                  data: bm
+                });
+              } else {
+                kept.push(bm);
+              }
+            }
+            b.bookmarks = kept;
+          }
+        }
+        if (!newEntries.length) return;
+        set({ workspaces: next.workspaces, trash: [...newEntries, ...next.trash] });
+      },
+
+      bulkMoveBookmarks: (ids, toBoardId) => {
+        if (!ids.length) return;
+        const next = clone(get());
+        const idSet = new Set(ids);
+        const dst = findBoardIn(next, toBoardId)?.board;
+        if (!dst) return;
+        // собираем в порядке исходного расположения
+        const moved: Bookmark[] = [];
+        for (const w of next.workspaces) {
+          for (const b of w.boards) {
+            const kept: Bookmark[] = [];
+            for (const bm of b.bookmarks) {
+              if (idSet.has(bm.id) && b.id !== toBoardId) moved.push(bm);
+              else kept.push(bm);
+            }
+            if (b.id !== toBoardId) b.bookmarks = kept;
+          }
+        }
+        // в destination — те которые там уже были (могут быть в idSet) переставляем в конец
+        const dstKeep: Bookmark[] = [];
+        const dstMove: Bookmark[] = [];
+        for (const bm of dst.bookmarks) {
+          if (idSet.has(bm.id)) dstMove.push(bm);
+          else dstKeep.push(bm);
+        }
+        dst.bookmarks = [...dstKeep, ...dstMove, ...moved];
+        set({ workspaces: next.workspaces });
       }
     }),
     {
