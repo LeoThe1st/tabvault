@@ -6,6 +6,7 @@ import { Canvas } from '@/components/Canvas';
 import { SettingsMenu } from '@/components/SettingsMenu';
 import { SearchPanel } from '@/components/SearchPanel';
 import { BackgroundPicker } from '@/components/BackgroundPicker';
+import { FabColumn } from '@/components/FabColumn';
 
 export function App() {
   return (
@@ -68,33 +69,12 @@ function Root() {
       <Topbar />
       <Canvas ws={activeWs} />
 
-      <div className="fab fab-tr">
-        <button
-          className="fab-btn"
-          title="Поиск"
-          onClick={() => setSearchOpen((v) => !v)}
-        >
-          🔍
-        </button>
-        <button
-          className="fab-btn"
-          title="Меню"
-          onClick={(e) =>
-            setSettingsAnchor(settingsAnchor ? null : e.currentTarget)
-          }
-        >
-          ☰
-        </button>
-        <button
-          className="fab-btn"
-          title="Настройки"
-          onClick={(e) =>
-            setSettingsAnchor(settingsAnchor ? null : e.currentTarget)
-          }
-        >
-          ⚙
-        </button>
-      </div>
+      <FabColumn
+        onSearchToggle={() => setSearchOpen((v) => !v)}
+        onSettingsToggle={(anchor) =>
+          setSettingsAnchor(settingsAnchor ? null : anchor)
+        }
+      />
 
       <BackgroundPicker />
 

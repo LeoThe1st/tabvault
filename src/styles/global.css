@@ -486,6 +486,52 @@ body[data-theme='light'] .board-form { background: rgba(0, 0, 0, 0.02); }
 }
 .fab-btn:hover { transform: scale(1.05); border-color: var(--board-hover); }
 .fab-btn.active { background: var(--tab-active-bg); color: var(--tab-active-fg); }
+.fab-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.fab-btn:disabled:hover { transform: none; border-color: var(--board-border); }
+
+/* Раскрывающаяся колонка — в потоке. max-height + margin-top анимируются
+   в обе стороны, search плавно поднимается/опускается. Item-stagger поверх. */
+.fab-expand {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 0;
+  margin-top: -10px; /* съедает parent's gap, чтобы при свёрнутом не было лишнего места */
+  overflow: visible;
+  transition:
+    max-height 340ms cubic-bezier(.4, 0, .2, 1),
+    margin-top 340ms cubic-bezier(.4, 0, .2, 1);
+}
+.fab-expand.open {
+  max-height: 500px;
+  margin-top: 0;
+}
+.fab-expand .fab-btn {
+  transform: scale(0) translateY(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 220ms cubic-bezier(.2, .9, .3, 1.2),
+    opacity 160ms ease;
+  /* При сворачивании: верхние уходят первыми */
+  transition-delay: calc(var(--i, 0) * 30ms);
+}
+.fab-expand.open .fab-btn {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+  /* При раскрытии: нижние появляются первыми, верхние — последними */
+  transition-delay: calc((var(--last, 4) - var(--i, 0)) * 30ms);
+}
+
+/* Toggle: плавный поворот при смене иконки */
+.fab-toggle-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 220ms cubic-bezier(.2, .7, .2, 1);
+}
+.fab-toggle-icon.x { transform: rotate(90deg); }
 
 /* ===== Menu ===== */
 .menu {

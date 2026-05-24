@@ -92,6 +92,76 @@ export const DotsIcon = (p: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+export const SearchIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...stroke({ width: 18, height: 18, ...p })}>
+    <circle cx="11" cy="11" r="8" />
+    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+  </svg>
+);
+
+export const DownloadIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...stroke({ width: 18, height: 18, ...p })}>
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="7 10 12 15 17 10" />
+    <line x1="12" y1="15" x2="12" y2="3" />
+  </svg>
+);
+
+export const IncognitoIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...stroke({ width: 18, height: 18, ...p })}>
+    <path d="M4 13h16" />
+    <path d="M6 13l1.5-6a1 1 0 0 1 1-.8h7a1 1 0 0 1 1 .8L18 13" />
+    <circle cx="7.5" cy="16.5" r="2.5" />
+    <circle cx="16.5" cy="16.5" r="2.5" />
+    <path d="M10 16.5h4" />
+  </svg>
+);
+
+export const SelectIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...stroke({ width: 18, height: 18, ...p })}>
+    <rect x="3" y="3" width="18" height="18" rx="3" />
+    <path d="m8 12 3 3 5-6" />
+  </svg>
+);
+
+export const EyeIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...stroke({ width: 18, height: 18, ...p })}>
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+export const EyeOffIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...stroke({ width: 18, height: 18, ...p })}>
+    <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a19.6 19.6 0 0 1 5.06-5.94" />
+    <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a19.6 19.6 0 0 1-2.16 3.19" />
+    <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24" />
+    <line x1="1" y1="1" x2="23" y2="23" />
+  </svg>
+);
+
+export const CloseIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...stroke({ width: 18, height: 18, ...p })}>
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
+
+export const GearIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...stroke({ width: 18, height: 18, ...p })}>
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+  </svg>
+);
+
+export const MenuIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...stroke({ width: 18, height: 18, ...p })}>
+    <line x1="3" y1="6" x2="21" y2="6" />
+    <line x1="3" y1="12" x2="21" y2="12" />
+    <line x1="3" y1="18" x2="21" y2="18" />
+  </svg>
+);
+
 export const WallpaperIcon = (p: SVGProps<SVGSVGElement>) => (
   <svg {...stroke({ width: 18, height: 18, ...p })}>
     <rect x="3" y="3" width="18" height="18" rx="2" />
