@@ -1,0 +1,46 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Pack extension
+        run: |
+          NAME="tabvault-${GITHUB_REF_NAME}"
+          cp -r dist "$NAME"
+          zip -r "${NAME}.zip" "$NAME"
+          echo "ASSET=${NAME}.zip" >> "$GITHUB_ENV"
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ASSET }}
+          generate_release_notes: true
+          name: ${{ github.ref_name }}
+          body: |
+            ## Установка
+            1. Скачай `${{ env.ASSET }}` ниже
+            2. Распакуй архив
+            3. Открой `chrome://extensions`
+            4. Включи **Developer mode** (правый верхний угол)
+            5. Жми **Load unpacked** и выбери распакованную папку
+            6. Открой новую вкладку — увидишь TabVault

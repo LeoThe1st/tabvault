@@ -13,3 +13,4 @@ build/
 vite.config.js
 src/**/*.js
 src/**/*.js.map
+tabvault-*.zip
