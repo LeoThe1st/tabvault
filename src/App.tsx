@@ -9,6 +9,7 @@ import { SearchPanel } from '@/components/SearchPanel';
 import { BackgroundPicker } from '@/components/BackgroundPicker';
 import { FabColumn } from '@/components/FabColumn';
 import { SelectionBar } from '@/components/SelectionBar';
+import { Wallpaper } from '@/components/Wallpaper';
 
 export function App() {
   return (
@@ -69,13 +70,7 @@ function Root() {
   }, [showDescriptions]);
 
   useEffect(() => {
-    if (bgImage) {
-      document.body.style.backgroundImage = `url("${bgImage.replace(/"/g, '\\"')}")`;
-      document.body.classList.add('has-bg');
-    } else {
-      document.body.style.backgroundImage = '';
-      document.body.classList.remove('has-bg');
-    }
+    document.body.classList.toggle('has-bg', !!bgImage);
   }, [bgImage]);
 
   useEffect(() => attachExternalSync(), []);
@@ -97,6 +92,7 @@ function Root() {
 
   return (
     <>
+      <Wallpaper />
       <Topbar />
       <Canvas ws={activeWs} />
 

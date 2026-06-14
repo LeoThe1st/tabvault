@@ -49,11 +49,20 @@ html, body {
   min-height: 100vh;
   overflow-x: hidden;
 }
-body.has-bg {
-  background-size: cover;
-  background-position: center center;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
+.wallpaper {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  object-position: center center;
+  z-index: -1;
+  pointer-events: none;
+  user-select: none;
+  /* нативный <img> рендерится в полном разрешении устройства, никакого
+     ресемплинга через композитор (как было у background-attachment: fixed). */
+  image-rendering: high-quality;
+  -webkit-user-drag: none;
 }
 
 body.privacy .board > * { filter: blur(8px); transition: filter var(--tx); }

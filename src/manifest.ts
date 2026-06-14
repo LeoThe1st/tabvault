@@ -6,7 +6,7 @@ export default defineManifest({
   name: 'TabVault',
   version: pkg.version,
   description: pkg.description,
-  permissions: ['storage', 'bookmarks', 'tabs'],
+  permissions: ['storage', 'bookmarks', 'tabs', 'unlimitedStorage'],
   host_permissions: ['<all_urls>'],
   chrome_url_overrides: {
     newtab: 'src/newtab/index.html'

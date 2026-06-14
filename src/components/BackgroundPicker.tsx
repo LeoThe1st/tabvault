@@ -31,10 +31,10 @@ export function BackgroundPicker() {
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
-    if (file.size > 8 * 1024 * 1024) {
+    if (file.size > 25 * 1024 * 1024) {
       await dialogs.alert({
         title: 'Обои',
-        message: 'Файл слишком большой (максимум 8 МБ).'
+        message: 'Файл слишком большой (максимум 25 МБ).'
       });
       return;
     }

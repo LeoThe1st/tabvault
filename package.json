@@ -1,6 +1,6 @@
 {
   "name": "tabvault",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Визуальный менеджер закладок на новой вкладке: доски, drag-and-drop, быстрое сохранение, приватный режим.",
   "private": true,
   "type": "module",
