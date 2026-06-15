@@ -951,6 +951,94 @@ body[data-theme='light'] .settings-sidebar { background: rgba(0, 0, 0, 0.03); }
 .support-list-title { font-size: 14px; font-weight: 600; margin-top: 4px; }
 .support-list { margin: 0; padding-left: 20px; color: var(--fg-mute); font-size: 13.5px; line-height: 1.6; }
 
+/* ===== Hotkey binder ===== */
+.hotkey-binder {
+  background: var(--row-hover);
+  border: 1px solid var(--board-border);
+  color: var(--fg);
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  min-width: 140px;
+  text-align: center;
+  transition: var(--tx);
+}
+.hotkey-binder:hover { background: var(--board-hover); }
+.hotkey-binder.recording {
+  border-color: var(--accent);
+  background: var(--board-bg);
+  color: var(--accent);
+  animation: hotkey-pulse 1.4s ease-in-out infinite;
+}
+@keyframes hotkey-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(199, 201, 209, 0); }
+  50% { box-shadow: 0 0 0 4px rgba(199, 201, 209, 0.15); }
+}
+.hotkey-clear {
+  background: transparent;
+  border: none;
+  color: var(--fg-mute);
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--tx);
+}
+.hotkey-clear:hover { background: var(--row-hover); color: var(--fg); }
+.hotkey-warn {
+  font-size: 11px;
+  color: var(--danger);
+  margin-left: 6px;
+}
+
+/* ===== Drag overlay: bookmark stack ===== */
+.bm-overlay {
+  min-width: 240px;
+  max-width: 320px;
+}
+.bm-overlay .bm {
+  background: var(--board-bg);
+  border: 1px solid var(--board-hover);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.bm-stack-card {
+  position: absolute;
+  inset: 0;
+  background: var(--board-bg);
+  border: 1px solid var(--board-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  pointer-events: none;
+}
+.bm-stack-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 7px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  z-index: 1;
+}
+
 /* ===== Selection mode bottom bar ===== */
 .selection-bar {
   position: fixed;

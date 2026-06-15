@@ -1,6 +1,6 @@
 import { uid } from '@/lib/uid';
 import type { State } from './types';
-import { MAX_COLS } from './types';
+import { DEFAULT_HOTKEYS, MAX_COLS } from './types';
 
 export function defaultState(): State {
   const wsId = uid();
@@ -13,6 +13,7 @@ export function defaultState(): State {
     showFavicons: true,
     showDescriptions: true,
     bgImage: null,
+    hotkeys: { ...DEFAULT_HOTKEYS },
     activeWsId: wsId,
     trash: [],
     workspaces: [

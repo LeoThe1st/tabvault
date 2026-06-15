@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useStore } from '@/store/store';
 import { useDialogs } from '@/dialogs/DialogHost';
 import { Toggle } from './Toggle';
+import { HotkeysTab } from './HotkeysTab';
 import { CloseIcon, GearIcon, TrashIcon } from './icons';
 
 const REPO = 'LeoThe1st/tabvault';
@@ -12,7 +13,7 @@ interface Props {
   onClose: () => void;
 }
 
-type Tab = 'general' | 'support';
+type Tab = 'general' | 'hotkeys' | 'support';
 
 export function SettingsModal({ onClose }: Props) {
   const [tab, setTab] = useState<Tab>('general');
@@ -41,6 +42,12 @@ export function SettingsModal({ onClose }: Props) {
               <GearIcon /> General
             </button>
             <button
+              className={'settings-nav-btn' + (tab === 'hotkeys' ? ' active' : '')}
+              onClick={() => setTab('hotkeys')}
+            >
+              <KeyboardIcon /> Hotkeys
+            </button>
+            <button
               className={'settings-nav-btn' + (tab === 'support' ? ' active' : '')}
               onClick={() => setTab('support')}
             >
@@ -53,7 +60,9 @@ export function SettingsModal({ onClose }: Props) {
           <button className="settings-close" title="Close" onClick={onClose}>
             <CloseIcon />
           </button>
-          {tab === 'general' ? <GeneralTab /> : <SupportTab />}
+          {tab === 'general' && <GeneralTab />}
+          {tab === 'hotkeys' && <HotkeysTab />}
+          {tab === 'support' && <SupportTab />}
         </div>
       </div>
     </div>,
@@ -258,6 +267,30 @@ function SettingRow({
       </div>
       <div className="setting-row-control">{control}</div>
     </div>
+  );
+}
+
+function KeyboardIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width={18}
+      height={18}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="2" y="6" width="20" height="12" rx="2" />
+      <path d="M6 10h.01" />
+      <path d="M10 10h.01" />
+      <path d="M14 10h.01" />
+      <path d="M18 10h.01" />
+      <path d="M6 14h.01" />
+      <path d="M18 14h.01" />
+      <path d="M10 14h4" />
+    </svg>
   );
 }
 

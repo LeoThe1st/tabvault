@@ -34,6 +34,43 @@ export interface LegacyColumn {
 
 export type Theme = 'dark' | 'light';
 
+export type HotkeyAction =
+  | 'search'
+  | 'settings'
+  | 'trash'
+  | 'togglePrivacy'
+  | 'toggleIncognito'
+  | 'toggleSelection'
+  | 'newBoard'
+  | 'nextWs'
+  | 'prevWs';
+
+export type Hotkeys = Record<HotkeyAction, string | null>;
+
+export const DEFAULT_HOTKEYS: Hotkeys = {
+  search: 'Alt+K',
+  settings: 'Alt+,',
+  trash: null,
+  togglePrivacy: 'Alt+Shift+P',
+  toggleIncognito: null,
+  toggleSelection: 'Alt+M',
+  newBoard: 'Alt+N',
+  nextWs: 'Alt+]',
+  prevWs: 'Alt+['
+};
+
+export const HOTKEY_META: Record<HotkeyAction, { title: string; desc: string }> = {
+  search: { title: 'Поиск', desc: 'Открыть/закрыть панель поиска' },
+  settings: { title: 'Настройки', desc: 'Открыть это окно' },
+  trash: { title: 'Корзина', desc: 'Открыть диалог удалённого' },
+  togglePrivacy: { title: 'Privacy blur', desc: 'Включить/выключить размытие досок' },
+  toggleIncognito: { title: 'Open in Incognito', desc: 'Переключить режим открытия в инкогнито' },
+  toggleSelection: { title: 'Selection mode', desc: 'Войти/выйти из multi-select' },
+  newBoard: { title: 'New board', desc: 'Создать доску в активной странице' },
+  nextWs: { title: 'Next page', desc: 'Следующий workspace' },
+  prevWs: { title: 'Previous page', desc: 'Предыдущий workspace' }
+};
+
 export interface TrashedBookmark {
   id: string;
   deletedAt: number;
@@ -63,6 +100,7 @@ export interface State {
   showFavicons: boolean;
   showDescriptions: boolean;
   bgImage: string | null;
+  hotkeys: Hotkeys;
   activeWsId: string;
   workspaces: Workspace[];
   trash: TrashEntry[];

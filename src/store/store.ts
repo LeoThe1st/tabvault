@@ -4,8 +4,8 @@ import { uid } from '@/lib/uid';
 import { chromeStorage, subscribeExternalChanges } from './storage';
 import { defaultState } from './defaults';
 import { compactColumn, migrateState } from './migrate';
-import type { Bookmark, Board, State, Theme, TrashEntry, Workspace } from './types';
-import { INBOX_NAME, MAX_COLS, STORAGE_KEY } from './types';
+import type { Bookmark, Board, HotkeyAction, State, Theme, TrashEntry, Workspace } from './types';
+import { DEFAULT_HOTKEYS, INBOX_NAME, MAX_COLS, STORAGE_KEY } from './types';
 
 interface Actions {
   setActiveWs: (id: string) => void;
@@ -48,6 +48,9 @@ interface Actions {
 
   bulkDeleteBookmarks: (ids: string[]) => void;
   bulkMoveBookmarks: (ids: string[], toBoardId: string) => void;
+
+  setHotkey: (action: HotkeyAction, combo: string | null) => void;
+  resetHotkeys: () => void;
 }
 
 type Store = State & Actions;
@@ -334,6 +337,12 @@ export const useStore = create<Store>()(
         set({ workspaces: next.workspaces, trash: [...newEntries, ...next.trash] });
       },
 
+      setHotkey: (action, combo) => {
+        set({ hotkeys: { ...get().hotkeys, [action]: combo } });
+      },
+
+      resetHotkeys: () => set({ hotkeys: { ...DEFAULT_HOTKEYS } }),
+
       bulkMoveBookmarks: (ids, toBoardId) => {
         if (!ids.length) return;
         const next = clone(get());
@@ -376,6 +385,7 @@ export const useStore = create<Store>()(
         showFavicons: s.showFavicons,
         showDescriptions: s.showDescriptions,
         bgImage: s.bgImage,
+        hotkeys: s.hotkeys,
         activeWsId: s.activeWsId,
         workspaces: s.workspaces,
         trash: s.trash

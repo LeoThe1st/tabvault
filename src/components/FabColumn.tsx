@@ -4,7 +4,6 @@ import { useDialogs } from '@/dialogs/DialogHost';
 import { useSelection } from '@/contexts/SelectionContext';
 import { importChromeBookmarks } from '@/lib/importChrome';
 import { ImportTextDialog } from './ImportTextDialog';
-import { TrashDialog } from './TrashDialog';
 import { Popover } from './Popover';
 import {
   BrowserIcon,
@@ -24,15 +23,16 @@ import {
 interface Props {
   onSearchToggle: () => void;
   onSettingsToggle: () => void;
+  trashOpen: boolean;
+  onTrashToggle: () => void;
 }
 
-export function FabColumn({ onSearchToggle, onSettingsToggle }: Props) {
+export function FabColumn({ onSearchToggle, onSettingsToggle, trashOpen, onTrashToggle }: Props) {
   const dialogs = useDialogs();
   const [open, setOpen] = useState(false);
   const [animating, setAnimating] = useState(false);
   const [importAnchor, setImportAnchor] = useState<HTMLButtonElement | null>(null);
   const [importTextOpen, setImportTextOpen] = useState(false);
-  const [trashOpen, setTrashOpen] = useState(false);
   const trashCount = useStore((s) => s.trash.length);
   const selection = useSelection();
   const privacy = useStore((s) => s.privacy);
@@ -130,7 +130,7 @@ export function FabColumn({ onSearchToggle, onSettingsToggle }: Props) {
       key: 'trash',
       title: trashCount > 0 ? `Корзина (${trashCount})` : 'Корзина',
       icon: <TrashIcon />,
-      onClick: () => setTrashOpen(true),
+      onClick: onTrashToggle,
       active: trashOpen
     },
     {
@@ -204,7 +204,6 @@ export function FabColumn({ onSearchToggle, onSettingsToggle }: Props) {
       )}
 
       {importTextOpen && <ImportTextDialog onClose={() => setImportTextOpen(false)} />}
-      {trashOpen && <TrashDialog onClose={() => setTrashOpen(false)} />}
     </div>
   );
 }

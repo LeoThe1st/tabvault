@@ -1,6 +1,6 @@
 import { uid } from '@/lib/uid';
 import type { State, Workspace } from './types';
-import { MAX_COLS, TRASH_TTL_MS } from './types';
+import { DEFAULT_HOTKEYS, MAX_COLS, TRASH_TTL_MS } from './types';
 
 export function migrateWorkspace(ws: Workspace): void {
   if (Array.isArray(ws.columns) && !Array.isArray(ws.boards)) {
@@ -54,5 +54,12 @@ export function migrateState(s: State): State {
   if (typeof s.showFavicons !== 'boolean') s.showFavicons = true;
   if (typeof s.showDescriptions !== 'boolean') s.showDescriptions = true;
   if (typeof s.openInIncognito !== 'boolean') s.openInIncognito = false;
+  // hotkeys — поле могло отсутствовать или быть неполным, дополняем дефолтами
+  if (!s.hotkeys || typeof s.hotkeys !== 'object') s.hotkeys = { ...DEFAULT_HOTKEYS };
+  else {
+    for (const key of Object.keys(DEFAULT_HOTKEYS) as Array<keyof typeof DEFAULT_HOTKEYS>) {
+      if (!(key in s.hotkeys)) s.hotkeys[key] = DEFAULT_HOTKEYS[key];
+    }
+  }
   return s;
 }
