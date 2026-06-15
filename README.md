@@ -8,7 +8,7 @@
 [![Latest Release](https://img.shields.io/github/v/release/LeoThe1st/tabvault?style=flat-square&color=6d28d9)](https://github.com/LeoThe1st/tabvault/releases/latest)
 [![License](https://img.shields.io/badge/license-GPL--3.0-blue?style=flat-square)](LICENSE)
 [![Built with](https://img.shields.io/badge/built%20with-React%20%2B%20TS%20%2B%20Vite-61dafb?style=flat-square)](#tech-stack)
-[![Manifest V3](https://img.shields.io/badge/Chrome-Manifest%20V3-brightgreen?style=flat-square)](https://developer.chrome.com/docs/extensions/mv3/intro/)
+[![Manifest V3](https://img.shields.io/badge/MV3-Chrome%20%E2%80%A2%20Firefox%20128%2B-brightgreen?style=flat-square)](https://developer.chrome.com/docs/extensions/mv3/intro/)
 
 [English](#-tabvault-en) · [Русский](#-tabvault-ru)
 
@@ -38,12 +38,22 @@ Organize your bookmarks as **drag-and-drop boards** on a clean new-tab page. Mul
 
 ### 📥 Install (users)
 
-1. Download `tabvault-vX.X.X.zip` from the [latest release](https://github.com/LeoThe1st/tabvault/releases/latest)
-2. Extract the archive — you'll get a folder `tabvault-vX.X.X/`
+Each release ships two zips on the [releases page](https://github.com/LeoThe1st/tabvault/releases/latest).
+
+#### Chrome / Edge / Brave / Opera / Vivaldi
+1. Download `tabvault-chrome-vX.X.X.zip`
+2. Extract the archive
 3. Open `chrome://extensions`
 4. Enable **Developer mode** (top-right toggle)
 5. Click **Load unpacked** and select the extracted folder
-6. Open a new tab — TabVault is live
+
+#### Firefox (128+)
+1. Download `tabvault-firefox-vX.X.X.zip`
+2. Extract the archive
+3. Open `about:debugging#/runtime/this-firefox`
+4. Click **Load Temporary Add-on…** and select `manifest.json` inside the extracted folder
+
+> Firefox 128+ supports MV3. If MV3 extensions are not loading, ensure `extensions.manifestV3.enabled` is `true` in `about:config`.
 
 ### 🛠️ Build from source (developers)
 
@@ -53,12 +63,13 @@ Requires Node.js 20+.
 git clone https://github.com/LeoThe1st/tabvault.git
 cd tabvault
 npm install
-npm run dev      # Vite dev-server with HMR (writes to dist/)
-npm run build    # production bundle in dist/
+npm run dev              # Vite dev-server with HMR (writes to dist/)
+npm run build            # Chrome bundle in dist/
+npm run build:firefox    # Firefox bundle in dist-firefox/
 npm run typecheck
 ```
 
-Then load `dist/` as an unpacked extension.
+Then load `dist/` (Chrome) or `dist-firefox/` (Firefox) as an unpacked extension.
 
 ### 🧰 Tech stack
 
@@ -116,12 +127,22 @@ Pull requests welcome. For bug reports use the **Open Bug Report Form** button i
 
 ### 📥 Установка (для пользователей)
 
-1. Скачай `tabvault-vX.X.X.zip` с [последнего релиза](https://github.com/LeoThe1st/tabvault/releases/latest)
-2. Распакуй архив — внутри будет папка `tabvault-vX.X.X/`
+В каждом [релизе](https://github.com/LeoThe1st/tabvault/releases/latest) лежат два zip'а.
+
+#### Chrome / Edge / Brave / Opera / Vivaldi
+1. Скачай `tabvault-chrome-vX.X.X.zip`
+2. Распакуй
 3. Открой `chrome://extensions`
-4. Включи **Developer mode** (тумблер в правом верхнем углу)
+4. Включи **Developer mode**
 5. Жми **Load unpacked** и выбери распакованную папку
-6. Открой новую вкладку — TabVault на месте
+
+#### Firefox (128+)
+1. Скачай `tabvault-firefox-vX.X.X.zip`
+2. Распакуй
+3. Открой `about:debugging#/runtime/this-firefox`
+4. Жми **Load Temporary Add-on…** и выбери `manifest.json` внутри распакованной папки
+
+> Firefox 128+ поддерживает MV3. Если расширение не грузится — проверь `extensions.manifestV3.enabled = true` в `about:config`.
 
 ### 🛠️ Сборка из исходников (для разработчиков)
 
@@ -131,8 +152,9 @@ Pull requests welcome. For bug reports use the **Open Bug Report Form** button i
 git clone https://github.com/LeoThe1st/tabvault.git
 cd tabvault
 npm install
-npm run dev      # Vite dev-сервер с HMR (пишет в dist/)
-npm run build    # продакшен-бандл в dist/
+npm run dev              # Vite dev-сервер с HMR (пишет в dist/)
+npm run build            # Chrome-бандл в dist/
+npm run build:firefox    # Firefox-бандл в dist-firefox/
 npm run typecheck
 ```
 

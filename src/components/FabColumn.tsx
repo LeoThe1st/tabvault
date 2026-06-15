@@ -3,6 +3,7 @@ import { useStore } from '@/store/store';
 import { useDialogs } from '@/dialogs/DialogHost';
 import { useSelection } from '@/contexts/SelectionContext';
 import { importChromeBookmarks } from '@/lib/importChrome';
+import { browser, isExtension } from '@/lib/browser';
 import { ImportTextDialog } from './ImportTextDialog';
 import { Popover } from './Popover';
 import {
@@ -43,7 +44,7 @@ export function FabColumn({ onSearchToggle, onSettingsToggle, trashOpen, onTrash
 
   const onImportBrowser = async () => {
     setImportAnchor(null);
-    if (typeof chrome === 'undefined' || !chrome.bookmarks) {
+    if (!isExtension || !browser.bookmarks) {
       await dialogs.alert({
         title: 'Импорт',
         message: 'Доступно только в установленном расширении.'

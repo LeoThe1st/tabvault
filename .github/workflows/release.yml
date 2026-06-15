@@ -21,26 +21,45 @@ jobs:
 
       - run: npm ci
 
-      - run: npm run build
+      - name: Build Chrome
+        run: npm run build
 
-      - name: Pack extension
+      - name: Build Firefox (post-process)
+        run: node scripts/build-firefox.mjs
+
+      - name: Pack Chrome zip
         run: |
-          NAME="tabvault-${GITHUB_REF_NAME}"
+          NAME="tabvault-chrome-${GITHUB_REF_NAME}"
           cp -r dist "$NAME"
           zip -r "${NAME}.zip" "$NAME"
-          echo "ASSET=${NAME}.zip" >> "$GITHUB_ENV"
+          echo "CHROME_ZIP=${NAME}.zip" >> "$GITHUB_ENV"
+
+      - name: Pack Firefox zip
+        run: |
+          NAME="tabvault-firefox-${GITHUB_REF_NAME}"
+          cp -r dist-firefox "$NAME"
+          zip -r "${NAME}.zip" "$NAME"
+          echo "FIREFOX_ZIP=${NAME}.zip" >> "$GITHUB_ENV"
 
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ env.ASSET }}
+          files: |
+            ${{ env.CHROME_ZIP }}
+            ${{ env.FIREFOX_ZIP }}
           generate_release_notes: true
           name: ${{ github.ref_name }}
           body: |
             ## Установка
-            1. Скачай `${{ env.ASSET }}` ниже
-            2. Распакуй архив
-            3. Открой `chrome://extensions`
-            4. Включи **Developer mode** (правый верхний угол)
-            5. Жми **Load unpacked** и выбери распакованную папку
-            6. Открой новую вкладку — увидишь TabVault
+
+            ### Chrome / Edge / Brave / Opera / Vivaldi
+            1. Скачай `${{ env.CHROME_ZIP }}` ниже
+            2. Распакуй
+            3. `chrome://extensions` → включи **Developer mode** → **Load unpacked** → выбери распакованную папку
+
+            ### Firefox (128+)
+            1. Скачай `${{ env.FIREFOX_ZIP }}` ниже
+            2. Распакуй
+            3. `about:debugging#/runtime/this-firefox` → **Load Temporary Add-on…** → выбери `manifest.json` внутри распакованной папки
+
+            > Firefox 128+ требует включить в `about:config` параметр `extensions.manifestV3.enabled = true`, если ещё не включён по умолчанию.

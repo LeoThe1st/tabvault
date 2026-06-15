@@ -4,6 +4,7 @@ import type { Board as B } from '@/store/types';
 import { useStore } from '@/store/store';
 import { useDialogs } from '@/dialogs/DialogHost';
 import { fetchTitleAndDesc } from '@/lib/fetchMeta';
+import { browser, isExtension } from '@/lib/browser';
 import { BookmarkItem } from './Bookmark';
 import { BoardForm } from './BoardForm';
 import { Popover } from './Popover';
@@ -92,8 +93,8 @@ export function BoardView({
   const onMenuOpenAll = () => {
     setMenuAnchor(null);
     for (const bm of board.bookmarks) {
-      if (typeof chrome !== 'undefined' && chrome.tabs?.create) {
-        chrome.tabs.create({ url: bm.url, active: false });
+      if (isExtension && browser.tabs?.create) {
+        void browser.tabs.create({ url: bm.url, active: false });
       } else {
         window.open(bm.url, '_blank');
       }

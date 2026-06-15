@@ -401,7 +401,7 @@ export const useStore = create<Store>()(
   )
 );
 
-/** Inbox helper — нужен и UI, и background-worker (но bg использует chrome.storage напрямую). */
+/** Inbox helper — нужен и UI, и background-worker (но bg использует browser.storage напрямую). */
 export function ensureInbox(ws: Workspace): Board {
   let inbox = ws.boards.find((b) => b.name === INBOX_NAME);
   if (inbox) return inbox;
