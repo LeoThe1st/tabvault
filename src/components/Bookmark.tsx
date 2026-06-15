@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { useDraggable, useDroppable } from '@dnd-kit/core';
+import { useDndContext, useDraggable, useDroppable } from '@dnd-kit/core';
 import type { Bookmark as Bm, Board } from '@/store/types';
 import { faviconFor } from '@/lib/favicon';
 import { openUrl } from '@/lib/openUrl';
@@ -22,6 +22,16 @@ export function BookmarkItem({ bm, board, dropMark }: Props) {
   const openInIncognito = useStore((s) => s.openInIncognito);
   const selection = useSelection();
   const isSelected = selection.isSelected(bm.id);
+
+  // Если активен bulk-drag (selection mode и схвачена выделенная закладка) —
+  // визуально гасим и остальные выделенные, чтобы было понятно что они «уходят» вместе.
+  const dnd = useDndContext();
+  const activeData = dnd.active?.data?.current as any;
+  const bulkDragActive =
+    !!activeData &&
+    activeData.type === 'bookmark' &&
+    activeData.selectionActive &&
+    activeData.selected;
 
   const draggable = useDraggable({
     id: 'bm:' + bm.id,
@@ -83,6 +93,7 @@ export function BookmarkItem({ bm, board, dropMark }: Props) {
   const classes = [
     'bm',
     draggable.isDragging && 'dragging',
+    bulkDragActive && isSelected && 'dragging',
     menuAnchor && 'menu-open',
     dropMark === 'before' && 'drop-before',
     dropMark === 'after' && 'drop-after',

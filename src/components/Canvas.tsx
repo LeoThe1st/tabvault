@@ -262,24 +262,42 @@ export function Canvas({ ws }: Props) {
       </main>
 
       <DragOverlay dropAnimation={null}>
-        {activeBm && <BookmarkOverlay bm={activeBm} />}
+        {activeBm && (
+          <BookmarkOverlay
+            bm={activeBm}
+            stackCount={
+              selection.active && selection.isSelected(activeBm.id)
+                ? selection.count
+                : 1
+            }
+          />
+        )}
         {activeBoard && <BoardOverlay board={activeBoard} />}
       </DragOverlay>
     </DndContext>
   );
 }
 
-function BookmarkOverlay({ bm }: { bm: Bookmark }) {
+function BookmarkOverlay({ bm, stackCount }: { bm: Bookmark; stackCount: number }) {
   return (
-    <li className="bm" style={{ listStyle: 'none', opacity: 0.9, cursor: 'grabbing', pointerEvents: 'none' }}>
-      <span className="bm-link" style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '9px 10px', color: 'inherit', flex: 1, minWidth: 0, fontSize: 14.5 }}>
-        <img className="bm-icon" src={bm.favIconUrl || faviconFor(bm.url)} alt="" />
-        <span className="bm-text">
-          <span className="bm-title">{bm.title || bm.url}</span>
-          {bm.description && <span className="bm-desc">{bm.description}</span>}
+    <div className="bm-overlay" style={{ position: 'relative' }}>
+      {stackCount > 1 && (
+        <>
+          <div className="bm-stack-card" style={{ transform: 'translate(8px, 8px) rotate(2deg)' }} />
+          <div className="bm-stack-card" style={{ transform: 'translate(4px, 4px) rotate(-1deg)' }} />
+        </>
+      )}
+      <li className="bm" style={{ listStyle: 'none', opacity: 0.95, cursor: 'grabbing', pointerEvents: 'none', position: 'relative' }}>
+        <span className="bm-link" style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '9px 10px', color: 'inherit', flex: 1, minWidth: 0, fontSize: 14.5 }}>
+          <img className="bm-icon" src={bm.favIconUrl || faviconFor(bm.url)} alt="" />
+          <span className="bm-text">
+            <span className="bm-title">{bm.title || bm.url}</span>
+            {bm.description && <span className="bm-desc">{bm.description}</span>}
+          </span>
         </span>
-      </span>
-    </li>
+      </li>
+      {stackCount > 1 && <span className="bm-stack-badge">+{stackCount - 1}</span>}
+    </div>
   );
 }
 
